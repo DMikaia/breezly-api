@@ -14,10 +14,10 @@ export const notifications = pgTable(
   {
     id: serial('notification_id').primaryKey(),
     sender_id: integer('sender_id')
-      .references(() => users.id)
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
     recipient_id: integer('recipient_id')
-      .references(() => users.id)
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
     content: text('content').notNull(),
     created_at: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),

@@ -36,6 +36,13 @@
       "when": 1727962676175,
       "tag": "0004_next_hairball",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1727969003413,
+      "tag": "0005_fast_ares",
+      "breakpoints": true
     }
   ]
 }

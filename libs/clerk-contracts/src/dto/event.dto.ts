@@ -1,4 +1,4 @@
-import { ClerkUser } from './clerk.user.dto';
+import { ClerkUser, DeletedUser } from './clerk.user.dto';
 import { ClerkHeaders } from './req.dto';
 
 export class Event {
@@ -7,7 +7,7 @@ export class Event {
 }
 
 export class Data {
-  data: ClerkUser;
+  data: ClerkUser | DeletedUser;
   object: string;
   type: string;
 }

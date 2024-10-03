@@ -3,6 +3,11 @@ export class EmailAddress {
   id: string;
 }
 
+export class DeletedUser {
+  deleted: boolean;
+  id: string;
+}
+
 export class ClerkUser {
   id: string;
   username?: string;

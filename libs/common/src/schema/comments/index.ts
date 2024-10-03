@@ -14,10 +14,10 @@ export const comments = pgTable(
   {
     id: serial('comment_id').primaryKey(),
     blog_id: integer('blog_id')
-      .references(() => blogs.id)
+      .references(() => blogs.id, { onDelete: 'cascade' })
       .notNull(),
     user_id: integer('user_id')
-      .references(() => users.id)
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
     content: text('content').notNull(),
     created_at: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),

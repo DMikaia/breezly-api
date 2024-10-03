@@ -10,14 +10,19 @@ export class ClerkService {
   async handleClerkEvent(body: Data) {
     switch (body.type) {
       case 'user.created': {
-        const mapped_user = this.mapUser(body.data);
+        const mapped_user = this.mapUser(body.data as ClerkUser);
         await this.usersService.createUser(mapped_user);
 
         break;
       }
       case 'user.updated': {
-        const mapped_user = this.mapUser(body.data);
+        const mapped_user = this.mapUser(body.data as ClerkUser);
         await this.usersService.updateUser(mapped_user);
+
+        break;
+      }
+      case 'user.deleted': {
+        await this.usersService.deleteUser(body.data.id);
 
         break;
       }

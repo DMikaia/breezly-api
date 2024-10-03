@@ -26,4 +26,10 @@ export class UsersService {
       .set(user)
       .where(eq(schema.users.clerk_id, user.clerk_id));
   }
+
+  async deleteUser(clerk_id: string) {
+    await this.database
+      .delete(schema.users)
+      .where(eq(schema.users.clerk_id, clerk_id));
+  }
 }

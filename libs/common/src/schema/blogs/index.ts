@@ -14,7 +14,7 @@ export const blogs = pgTable(
   {
     id: serial('blog_id').primaryKey(),
     author_id: integer('author_id')
-      .references(() => users.id)
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
     title: text('title').notNull(),
     thumbnail: text('thumbnail').notNull(),
