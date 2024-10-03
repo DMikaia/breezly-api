@@ -3,6 +3,36 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true
+  },
+  "projects": {
+    "common": {
+      "type": "library",
+      "root": "libs/common",
+      "entryFile": "index",
+      "sourceRoot": "libs/common/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/common/tsconfig.lib.json"
+      }
+    },
+    "clerk-contracts": {
+      "type": "library",
+      "root": "libs/clerk-contracts",
+      "entryFile": "index",
+      "sourceRoot": "libs/clerk-contracts/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/clerk-contracts/tsconfig.lib.json"
+      }
+    },
+    "user-contracts": {
+      "type": "library",
+      "root": "libs/user-contracts",
+      "entryFile": "index",
+      "sourceRoot": "libs/user-contracts/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/user-contracts/tsconfig.lib.json"
+      }
+    }
   }
 }

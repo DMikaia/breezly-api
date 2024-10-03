@@ -5,5 +5,13 @@
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "@libs/common/(.*)": "<rootDir>/../libs/common/src/$1",
+    "@libs/common": "<rootDir>/../libs/common/src",
+    "@libs/clerk-contracts/(.*)": "<rootDir>/../libs/clerk-contracts/src/$1",
+    "@libs/clerk-contracts": "<rootDir>/../libs/clerk-contracts/src",
+    "@libs/user-contracts/(.*)": "<rootDir>/../libs/user-contracts/src/$1",
+    "@libs/user-contracts": "<rootDir>/../libs/user-contracts/src"
   }
 }

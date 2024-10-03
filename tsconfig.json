@@ -16,6 +16,14 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@libs/common": ["libs/common/src"],
+      "@libs/common/*": ["libs/common/src/*"],
+      "@libs/clerk-contracts": ["libs/clerk-contracts/src"],
+      "@libs/clerk-contracts/*": ["libs/clerk-contracts/src/*"],
+      "@libs/user-contracts": ["libs/user-contracts/src"],
+      "@libs/user-contracts/*": ["libs/user-contracts/src/*"]
+    }
   }
 }

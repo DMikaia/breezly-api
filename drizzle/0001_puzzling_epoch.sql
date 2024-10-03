@@ -1,0 +1,1 @@
+ALTER TABLE "notifications" ADD COLUMN "notification_id" serial PRIMARY KEY NOT NULL;
