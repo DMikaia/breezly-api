@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { DATABASE_CONNECTION } from '@libs/common';
-import { User } from '@libs/user-contracts';
-import * as schema from '@libs/common/schema/users';
+import { mapped_user } from '@libs/user-contracts';
 import { eq } from 'drizzle-orm';
+import * as schema from '@libs/common/schema/users';
 
 const mockDatabase = {
   query: {
@@ -18,6 +18,9 @@ const mockDatabase = {
     set: jest.fn().mockReturnValue({
       where: jest.fn().mockResolvedValue(undefined),
     }),
+  }),
+  delete: jest.fn().mockReturnValue({
+    where: jest.fn().mockResolvedValue(undefined),
   }),
 };
 
@@ -58,43 +61,32 @@ describe('UsersService', () => {
 
   describe('createUser', () => {
     it('should insert a user into the database', async () => {
-      const user: User = {
-        clerk_id: 'clerk_1',
-        email: 'user@example.com',
-        username: 'user123',
-        first_name: 'John',
-        last_name: 'Doe',
-        profile_image_url: 'http://example.com/image.jpg',
-        created_at: new Date(),
-        updated_at: new Date(),
-      };
-
-      await usersService.createUser(user);
+      await usersService.createUser(mapped_user);
 
       expect(mockDatabase.insert).toHaveBeenCalledWith(schema.users);
-      expect(mockDatabase.insert().values).toHaveBeenCalledWith(user);
+      expect(mockDatabase.insert().values).toHaveBeenCalledWith(mapped_user);
     });
   });
 
   describe('updateUser', () => {
     it('should update a user in the database', async () => {
-      const user: User = {
-        clerk_id: 'clerk_1',
-        email: 'user@example.com',
-        username: 'user123',
-        first_name: 'John',
-        last_name: 'Doe',
-        profile_image_url: 'http://example.com/image.jpg',
-        created_at: new Date(),
-        updated_at: new Date(),
-      };
-
-      await usersService.updateUser(user);
+      await usersService.updateUser(mapped_user);
 
       expect(mockDatabase.update).toHaveBeenCalledWith(schema.users);
-      expect(mockDatabase.update().set).toHaveBeenCalledWith(user);
+      expect(mockDatabase.update().set).toHaveBeenCalledWith(mapped_user);
       expect(mockDatabase.update().set().where).toHaveBeenCalledWith(
-        eq(schema.users.clerk_id, user.clerk_id),
+        eq(schema.users.clerk_id, mapped_user.clerk_id),
+      );
+    });
+  });
+
+  describe('deleteUser', () => {
+    it('should delete a user in the database', async () => {
+      await usersService.deleteUser(mapped_user.clerk_id);
+
+      expect(mockDatabase.delete).toHaveBeenCalledWith(schema.users);
+      expect(mockDatabase.delete().where).toHaveBeenCalledWith(
+        eq(schema.users.clerk_id, mapped_user.clerk_id),
       );
     });
   });

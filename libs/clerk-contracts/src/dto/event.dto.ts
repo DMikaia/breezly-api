@@ -8,6 +8,6 @@ export class Event {
 
 export class Data {
   data: ClerkUser | DeletedUser;
-  object: string;
+  object: 'event';
   type: string;
 }
