@@ -10,6 +10,9 @@ import * as Joi from 'joi';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
+        CLERK_ISSUER_URL: Joi.string().required(),
+        CLERK_PUBLISHABLE_KEY: Joi.string().required(),
+        CLERK_SECRET_KEY: Joi.string().required(),
         CLERK_SIGNATURE: Joi.string().required(),
         DATABASE_URL: Joi.string().required(),
         GATEWAY_PORT: Joi.number().port().required(),

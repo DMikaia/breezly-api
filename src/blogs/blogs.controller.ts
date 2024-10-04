@@ -27,7 +27,9 @@ export class BlogsController {
   }
 
   @Get()
-  findAll() {
+  findAll(@Req() req: ClerkRequest) {
+    this.logger.log(req.clerk_id);
+
     return this.blogsService.findAll();
   }
 
