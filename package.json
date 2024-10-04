@@ -89,7 +89,8 @@
     "moduleNameMapper": {
       "^@libs/common(|/.*)$": "<rootDir>/libs/common/src/$1",
       "^@libs/clerk-contracts(|/.*)$": "<rootDir>/libs/clerk-contracts/src/$1",
-      "^@libs/user-contracts(|/.*)$": "<rootDir>/libs/user-contracts/src/$1"
+      "^@libs/user-contracts(|/.*)$": "<rootDir>/libs/user-contracts/src/$1",
+      "^@libs/blog-contracts(|/.*)$": "<rootDir>/libs/blog-contracts/src/$1"
     }
   }
 }

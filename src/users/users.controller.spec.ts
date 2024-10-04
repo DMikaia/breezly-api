@@ -6,12 +6,15 @@ import { DatabaseModule, JwtAuthGuard } from '@libs/common';
 import { ConfigModule } from '@nestjs/config';
 import { mockUsersService } from '@libs/user-contracts';
 import {
-  mockClerkService,
   ClerkEventModule,
   create_body,
   wrong_body,
   ClerkHttpGuard,
 } from '@libs/clerk-contracts';
+
+const mockClerkService = {
+  handleClerkEvent: jest.fn(),
+};
 
 describe('UsersController', () => {
   let usersController: UsersController;

@@ -23,7 +23,9 @@
       "@libs/clerk-contracts": ["libs/clerk-contracts/src"],
       "@libs/clerk-contracts/*": ["libs/clerk-contracts/src/*"],
       "@libs/user-contracts": ["libs/user-contracts/src"],
-      "@libs/user-contracts/*": ["libs/user-contracts/src/*"]
+      "@libs/user-contracts/*": ["libs/user-contracts/src/*"],
+      "@libs/blog-contracts": ["libs/blog-contracts/src"],
+      "@libs/blog-contracts/*": ["libs/blog-contracts/src/*"]
     }
   }
 }

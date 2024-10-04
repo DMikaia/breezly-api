@@ -1,26 +1,46 @@
-import { Injectable } from '@nestjs/common';
-import { CreateBlogDto } from './dto/create-blog.dto';
-import { UpdateBlogDto } from './dto/update-blog.dto';
+import { Inject, Injectable } from '@nestjs/common';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { DATABASE_CONNECTION } from '@libs/common';
+import { Blog } from '@libs/blog-contracts';
+import * as schema from '@libs/common/schema/blogs/';
+import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class BlogsService {
-  create(createBlogDto: CreateBlogDto) {
-    return 'This action adds a new blog';
+  constructor(
+    @Inject(DATABASE_CONNECTION)
+    private readonly database: NodePgDatabase<typeof schema>,
+  ) {}
+
+  async create(blog: Blog) {
+    await this.database.insert(schema.blogs).values(blog);
   }
 
-  findAll() {
-    return `This action returns all blogs`;
+  async findAll() {
+    return this.database.query.blogs.findMany({
+      with: {
+        comments: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} blog`;
+  async findOne(blog_id: number) {
+    return this.database.query.blogs.findFirst({
+      where: eq(schema.blogs.id, blog_id),
+      with: {
+        comments: true,
+      },
+    });
   }
 
-  update(id: number, updateBlogDto: UpdateBlogDto) {
-    return `This action updates a #${id} blog`;
+  async update(id: number, blog: Blog) {
+    await this.database
+      .update(schema.blogs)
+      .set(blog)
+      .where(eq(schema.blogs.id, id));
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} blog`;
+  async remove(id: number) {
+    await this.database.delete(schema.blogs).where(eq(schema.blogs.id, id));
   }
 }

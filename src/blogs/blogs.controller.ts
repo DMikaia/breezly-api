@@ -1,15 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { BlogsService } from './blogs.service';
-import { CreateBlogDto } from './dto/create-blog.dto';
-import { UpdateBlogDto } from './dto/update-blog.dto';
+import { Blog } from '@libs/blog-contracts';
+import { JwtAuthGuard } from '@libs/common';
 
+@UseGuards(JwtAuthGuard)
 @Controller('blogs')
 export class BlogsController {
   constructor(private readonly blogsService: BlogsService) {}
 
   @Post()
-  create(@Body() createBlogDto: CreateBlogDto) {
-    return this.blogsService.create(createBlogDto);
+  create(@Body() blog: Blog) {
+    return this.blogsService.create(blog);
   }
 
   @Get()
@@ -23,8 +33,8 @@ export class BlogsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBlogDto: UpdateBlogDto) {
-    return this.blogsService.update(+id, updateBlogDto);
+  update(@Param('id') id: string, @Body() blog: Blog) {
+    return this.blogsService.update(+id, blog);
   }
 
   @Delete(':id')

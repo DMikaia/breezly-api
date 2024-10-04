@@ -12,24 +12,24 @@ import { ClerkHttpGuard, Data } from '@libs/clerk-contracts';
 import { UsersService } from './users.service';
 import { ClerkService } from './clerk.service';
 
-@Controller()
+@Controller('users')
 export class UsersController {
   constructor(
     private readonly clerkService: ClerkService,
     private readonly usersService: UsersService,
   ) {}
 
-  @UseGuards(ClerkHttpGuard)
-  @HttpCode(HttpStatus.OK)
-  @Post('clerk')
-  async handleClerkEvent(@Body() body: Data) {
-    return await this.clerkService.handleClerkEvent(body);
-  }
-
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  @Get('/users')
+  @Get()
   async getUsers() {
     return await this.usersService.getUsers();
+  }
+
+  @UseGuards(ClerkHttpGuard)
+  @HttpCode(HttpStatus.OK)
+  @Post('/clerk')
+  async handleClerkEvent(@Body() body: Data) {
+    return await this.clerkService.handleClerkEvent(body);
   }
 }

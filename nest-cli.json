@@ -33,6 +33,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/user-contracts/tsconfig.lib.json"
       }
+    },
+    "blog-contracts": {
+      "type": "library",
+      "root": "libs/blog-contracts",
+      "entryFile": "index",
+      "sourceRoot": "libs/blog-contracts/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/blog-contracts/tsconfig.lib.json"
+      }
     }
   }
 }

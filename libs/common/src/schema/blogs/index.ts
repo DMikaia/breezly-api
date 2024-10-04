@@ -7,7 +7,8 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
-import { users, comments } from '../index';
+import { comments } from '../comments';
+import { users } from '../users';
 
 export const blogs = pgTable(
   'blogs',
