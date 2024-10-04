@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, HttpException } from '@nestjs/common';
 
 describe('JwtAuthGuard', () => {
   let guard: JwtAuthGuard;
@@ -26,6 +26,6 @@ describe('JwtAuthGuard', () => {
   it('should return false if not authenticated', async () => {
     const context = {} as ExecutionContext;
     jest.spyOn(guard, 'canActivate').mockResolvedValue(false);
-    expect(await guard.canActivate(context)).toBe(false);
+    expect(await guard.canActivate(context)).rejects.toThrow(HttpException);
   });
 });

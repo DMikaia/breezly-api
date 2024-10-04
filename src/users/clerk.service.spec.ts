@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { mapped_user } from '@libs/user-contracts';
 import { ClerkService } from './clerk.service';
 import { UsersService } from './users.service';
+import { mockUsersService } from '@libs/user-contracts';
 import {
   ClerkUser,
   create_body,
@@ -9,12 +10,6 @@ import {
   update_body,
   wrong_body,
 } from '@libs/clerk-contracts';
-
-const mockUsersService = {
-  createUser: jest.fn(),
-  updateUser: jest.fn(),
-  deleteUser: jest.fn(),
-};
 
 describe('ClerkService', () => {
   let clerkService: ClerkService;
@@ -28,6 +23,10 @@ describe('ClerkService', () => {
     }).compile();
 
     clerkService = module.get<ClerkService>(ClerkService);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
