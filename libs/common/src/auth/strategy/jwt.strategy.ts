@@ -29,7 +29,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: unknown): unknown {
-    return payload;
+  validate(payload: { clerk_id: string }): { clerk_id: string } {
+    return { clerk_id: payload.clerk_id };
   }
 }

@@ -33,7 +33,7 @@ describe('JwtStrategy', () => {
   });
 
   it('should validate the payload', () => {
-    const payload = { sub: '123', username: 'test' };
+    const payload = { sub: '123', clerk_id: 'test' };
     const result = strategy.validate(payload);
     expect(result).toEqual(payload);
   });

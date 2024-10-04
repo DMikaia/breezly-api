@@ -1,11 +1,4 @@
-import {
-  index,
-  integer,
-  pgTable,
-  serial,
-  text,
-  timestamp,
-} from 'drizzle-orm/pg-core';
+import { index, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 import { comments } from '../comments';
 import { users } from '../users';
@@ -14,8 +7,8 @@ export const blogs = pgTable(
   'blogs',
   {
     id: serial('blog_id').primaryKey(),
-    author_id: integer('author_id')
-      .references(() => users.id, { onDelete: 'cascade' })
+    author_id: text('author_id')
+      .references(() => users.clerk_id, { onDelete: 'cascade' })
       .notNull(),
     title: text('title').notNull(),
     thumbnail: text('thumbnail').notNull(),
@@ -33,7 +26,7 @@ export const blogs = pgTable(
 export const blogsRelations = relations(blogs, ({ many, one }) => ({
   user: one(users, {
     fields: [blogs.author_id],
-    references: [users.id],
+    references: [users.clerk_id],
   }),
   comments: many(comments),
 }));

@@ -1,16 +1,25 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { DATABASE_CONNECTION } from '@libs/common';
+import { AuthorUtils, DATABASE_CONNECTION } from '@libs/common';
 import { Blog } from '@libs/blog-contracts';
-import * as schema from '@libs/common/schema/blogs/';
 import { eq } from 'drizzle-orm';
+import * as schema from '@libs/common/schema/blogs';
 
 @Injectable()
-export class BlogsService {
+export class BlogsService implements AuthorUtils {
   constructor(
     @Inject(DATABASE_CONNECTION)
     private readonly database: NodePgDatabase<typeof schema>,
   ) {}
+
+  async isAuthor(id: string, author_id: string) {
+    return author_id != id;
+  }
 
   async create(blog: Blog) {
     await this.database.insert(schema.blogs).values(blog);
@@ -33,14 +42,34 @@ export class BlogsService {
     });
   }
 
-  async update(id: number, blog: Blog) {
+  async update(id: number, author_id: string, blog: Blog) {
+    const existing_blog = await this.findOne(id);
+
+    if (!existing_blog) {
+      throw new NotFoundException('Blog not found');
+    }
+
+    if (!(await this.isAuthor(existing_blog.author_id, author_id))) {
+      throw new UnauthorizedException('Action denied');
+    }
+
     await this.database
       .update(schema.blogs)
       .set(blog)
       .where(eq(schema.blogs.id, id));
   }
 
-  async remove(id: number) {
+  async remove(id: number, author_id: string) {
+    const existing_blog = await this.findOne(id);
+
+    if (!existing_blog) {
+      throw new NotFoundException('Blog not found');
+    }
+
+    if (!(await this.isAuthor(existing_blog.author_id, author_id))) {
+      throw new UnauthorizedException('Action denied');
+    }
+
     await this.database.delete(schema.blogs).where(eq(schema.blogs.id, id));
   }
 }

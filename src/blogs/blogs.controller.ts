@@ -7,14 +7,18 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
+  Logger,
 } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { Blog } from '@libs/blog-contracts';
-import { JwtAuthGuard } from '@libs/common';
+import { ClerkRequest, JwtAuthGuard } from '@libs/common';
 
 @UseGuards(JwtAuthGuard)
 @Controller('blogs')
 export class BlogsController {
+  private readonly logger = new Logger(BlogsController.name);
+
   constructor(private readonly blogsService: BlogsService) {}
 
   @Post()
@@ -33,12 +37,20 @@ export class BlogsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() blog: Blog) {
-    return this.blogsService.update(+id, blog);
+  update(
+    @Param('id') id: string,
+    @Req() req: ClerkRequest,
+    @Body() blog: Blog,
+  ) {
+    this.logger.log(req.clerk_id);
+
+    return this.blogsService.update(+id, req.clerk_id, blog);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.blogsService.remove(+id);
+  remove(@Param('id') id: string, @Req() req: ClerkRequest) {
+    this.logger.log(req.clerk_id);
+
+    return this.blogsService.remove(+id, req.clerk_id);
   }
 }

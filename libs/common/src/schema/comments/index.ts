@@ -16,8 +16,8 @@ export const comments = pgTable(
     blog_id: integer('blog_id')
       .references(() => blogs.id, { onDelete: 'cascade' })
       .notNull(),
-    user_id: integer('user_id')
-      .references(() => users.id, { onDelete: 'cascade' })
+    user_id: text('user_id')
+      .references(() => users.clerk_id, { onDelete: 'cascade' })
       .notNull(),
     content: text('content').notNull(),
     created_at: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
@@ -36,6 +36,6 @@ export const commentsRelations = relations(comments, ({ one }) => ({
   }),
   user: one(users, {
     fields: [comments.user_id],
-    references: [users.id],
+    references: [users.clerk_id],
   }),
 }));
