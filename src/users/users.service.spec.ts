@@ -9,6 +9,7 @@ const mockDatabase = {
   query: {
     users: {
       findMany: jest.fn(),
+      findFirst: jest.fn(),
     },
   },
   insert: jest.fn().mockReturnValue({
@@ -45,17 +46,36 @@ describe('UsersService', () => {
     jest.clearAllMocks();
   });
 
-  describe('getUsers', () => {
+  describe('findAll', () => {
     it('should return an array of users', async () => {
       const mockUsers = [
         { id: 1, clerk_id: 'clerk_1', email: 'user@example.com' },
       ];
       mockDatabase.query.users.findMany.mockResolvedValue(mockUsers);
 
-      const users = await usersService.getUsers();
+      const users = await usersService.findAll();
 
       expect(users).toEqual(mockUsers);
       expect(mockDatabase.query.users.findMany).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('findOne', () => {
+    it('should return a user with the provided user id', async () => {
+      const mockUser = {
+        id: 1,
+        clerk_id: 'clerk_1',
+        email: 'user@example.com',
+      };
+
+      mockDatabase.query.users.findFirst.mockResolvedValue(mockUser);
+
+      const users = await usersService.findOne(1);
+
+      expect(users).toEqual(mockUser);
+      expect(mockDatabase.query.users.findFirst).toHaveBeenCalledWith({
+        where: eq(schema.users.id, 1),
+      });
     });
   });
 

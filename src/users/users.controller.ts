@@ -4,10 +4,12 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseIntPipe,
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '@libs/common';
+import { AuthGuard } from '@libs/common';
 import { ClerkHttpGuard, Data } from '@libs/clerk-contracts';
 import { UsersService } from './users.service';
 import { ClerkService } from './clerk.service';
@@ -19,17 +21,24 @@ export class UsersController {
     private readonly usersService: UsersService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.OK)
-  @Get()
-  async getUsers() {
-    return await this.usersService.getUsers();
-  }
-
   @UseGuards(ClerkHttpGuard)
   @HttpCode(HttpStatus.OK)
-  @Post('/clerk')
+  @Post('clerk')
   async handleClerkEvent(@Body() body: Data) {
     return await this.clerkService.handleClerkEvent(body);
+  }
+
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Get()
+  async findAll() {
+    return await this.usersService.findAll();
+  }
+
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Get(':id')
+  async findOne(@Param('id', new ParseIntPipe()) id: number) {
+    return await this.usersService.findOne(id);
   }
 }

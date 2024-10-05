@@ -48,27 +48,51 @@ describe('UsersController', () => {
     expect(usersController).toBeDefined();
   });
 
-  describe('getUsers', () => {
+  describe('findAll', () => {
     it('should throw an unauthorized error with an undefined result', async () => {
       jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
 
-      expect(await usersController.getUsers()).toEqual(undefined);
+      expect(await usersController.findAll()).toEqual(undefined);
     });
 
     it('should return a 200 status with the list of users', async () => {
       jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
-      mockUsersService.getUsers.mockReturnValue({
+      mockUsersService.findAll.mockReturnValue({
         id: 1,
         clerk_id: 'clerk_1',
         email: 'user@example.com',
       });
 
-      expect(await usersController.getUsers()).toEqual({
+      expect(await usersController.findAll()).toEqual({
         id: 1,
         clerk_id: 'clerk_1',
         email: 'user@example.com',
       });
-      expect(usersService.getUsers).toHaveBeenCalled();
+      expect(usersService.findAll).toHaveBeenCalled();
+    });
+  });
+
+  describe('findOne', () => {
+    it('should throw an unauthorized error with an undefined result', async () => {
+      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
+
+      expect(await usersController.findOne(1)).toEqual(undefined);
+    });
+
+    it('should return a 200 status with the user public information', async () => {
+      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
+      mockUsersService.findOne.mockReturnValue({
+        id: 1,
+        clerk_id: 'clerk_1',
+        email: 'user@example.com',
+      });
+
+      expect(await usersController.findOne(1)).toEqual({
+        id: 1,
+        clerk_id: 'clerk_1',
+        email: 'user@example.com',
+      });
+      expect(usersService.findOne).toHaveBeenCalledWith(1);
     });
   });
 

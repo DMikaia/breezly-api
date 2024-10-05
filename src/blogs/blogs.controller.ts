@@ -2,34 +2,27 @@ import {
   Controller,
   Get,
   Post,
-  Body,
   Patch,
   Param,
   Delete,
   UseGuards,
   Req,
-  Logger,
 } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
-import { Blog } from '@libs/blog-contracts';
 import { ClerkRequest, AuthGuard } from '@libs/common';
 
 @UseGuards(AuthGuard)
 @Controller('blogs')
 export class BlogsController {
-  private readonly logger = new Logger(BlogsController.name);
-
   constructor(private readonly blogsService: BlogsService) {}
 
   @Post()
-  create(@Body() blog: Blog) {
-    return this.blogsService.create(blog);
+  create(@Req() req: ClerkRequest) {
+    return this.blogsService.create(req.clerk_id, req.body);
   }
 
   @Get()
-  findAll(@Req() req: ClerkRequest) {
-    this.logger.log(req.clerk_id);
-
+  findAll() {
     return this.blogsService.findAll();
   }
 
@@ -39,20 +32,12 @@ export class BlogsController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Req() req: ClerkRequest,
-    @Body() blog: Blog,
-  ) {
-    this.logger.log(req.clerk_id);
-
-    return this.blogsService.update(+id, req.clerk_id, blog);
+  update(@Param('id') id: string, @Req() req: ClerkRequest) {
+    return this.blogsService.update(+id, req.clerk_id, req.body);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: ClerkRequest) {
-    this.logger.log(req.clerk_id);
-
     return this.blogsService.remove(+id, req.clerk_id);
   }
 }

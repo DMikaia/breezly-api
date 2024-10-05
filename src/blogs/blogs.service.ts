@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { AuthorUtils, DATABASE_CONNECTION } from '@libs/common';
-import { Blog } from '@libs/blog-contracts';
+import { CreateBlog, UpdateBlog } from '@libs/blog-contracts';
 import { eq } from 'drizzle-orm';
 import * as schema from '@libs/common/schema/blogs';
 
@@ -18,11 +18,11 @@ export class BlogsService implements AuthorUtils {
   ) {}
 
   async isAuthor(id: string, author_id: string) {
-    return author_id != id;
+    return author_id == id;
   }
 
-  async create(blog: Blog) {
-    await this.database.insert(schema.blogs).values(blog);
+  async create(author_id: string, blog: CreateBlog) {
+    await this.database.insert(schema.blogs).values({ author_id, ...blog });
   }
 
   async findAll() {
@@ -42,14 +42,16 @@ export class BlogsService implements AuthorUtils {
     });
   }
 
-  async update(id: number, author_id: string, blog: Blog) {
+  async update(id: number, author_id: string, blog: UpdateBlog) {
     const existing_blog = await this.findOne(id);
 
     if (!existing_blog) {
       throw new NotFoundException('Blog not found');
     }
 
-    if (!(await this.isAuthor(existing_blog.author_id, author_id))) {
+    const is_author = await this.isAuthor(existing_blog.author_id, author_id);
+
+    if (!is_author) {
       throw new UnauthorizedException('Action denied');
     }
 
@@ -66,7 +68,9 @@ export class BlogsService implements AuthorUtils {
       throw new NotFoundException('Blog not found');
     }
 
-    if (!(await this.isAuthor(existing_blog.author_id, author_id))) {
+    const is_author = await this.isAuthor(existing_blog.author_id, author_id);
+
+    if (!is_author) {
       throw new UnauthorizedException('Action denied');
     }
 

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '@libs/common';
 import * as schema from '@libs/common/schema/users';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
@@ -12,12 +12,24 @@ export class UsersService {
     private readonly database: NodePgDatabase<typeof schema>,
   ) {}
 
-  async getUsers() {
-    return this.database.query.users.findMany({});
-  }
-
   async createUser(user: User) {
     await this.database.insert(schema.users).values(user);
+  }
+
+  async findOne(user_id: number) {
+    const user = await this.database.query.users.findFirst({
+      where: eq(schema.users.id, user_id),
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
+  async findAll() {
+    return this.database.query.users.findMany({});
   }
 
   async updateUser(user: User) {
