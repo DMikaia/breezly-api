@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ClerkService } from './clerk.service';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { DatabaseModule, JwtAuthGuard } from '@libs/common';
+import { DatabaseModule, AuthGuard } from '@libs/common';
 import { ConfigModule } from '@nestjs/config';
 import { mockUsersService } from '@libs/user-contracts';
 import {
@@ -50,15 +50,13 @@ describe('UsersController', () => {
 
   describe('getUsers', () => {
     it('should throw an unauthorized error with an undefined result', async () => {
-      jest
-        .spyOn(JwtAuthGuard.prototype, 'canActivate')
-        .mockResolvedValue(false);
+      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
 
       expect(await usersController.getUsers()).toEqual(undefined);
     });
 
     it('should return a 200 status with the list of users', async () => {
-      jest.spyOn(JwtAuthGuard.prototype, 'canActivate').mockResolvedValue(true);
+      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
       mockUsersService.getUsers.mockReturnValue({
         id: 1,
         clerk_id: 'clerk_1',

@@ -8,8 +8,8 @@ import {
 import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 
 @Injectable()
-export class JwtAuthGuard implements CanActivate {
-  private readonly logger = new Logger(JwtAuthGuard.name);
+export class AuthGuard implements CanActivate {
+  private readonly logger = new Logger(AuthGuard.name);
   private readonly requireAuth = ClerkExpressRequireAuth({});
 
   async canActivate(context: ExecutionContext): Promise<boolean> {

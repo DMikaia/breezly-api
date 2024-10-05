@@ -12,9 +12,9 @@ import {
 } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { Blog } from '@libs/blog-contracts';
-import { ClerkRequest, JwtAuthGuard } from '@libs/common';
+import { ClerkRequest, AuthGuard } from '@libs/common';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(AuthGuard)
 @Controller('blogs')
 export class BlogsController {
   private readonly logger = new Logger(BlogsController.name);
