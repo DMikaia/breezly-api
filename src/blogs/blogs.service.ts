@@ -26,7 +26,7 @@ export class BlogsService implements AuthorUtils {
   }
 
   async findAll() {
-    return this.database.query.blogs.findMany({
+    return await this.database.query.blogs.findMany({
       with: {
         comments: true,
       },
@@ -34,7 +34,7 @@ export class BlogsService implements AuthorUtils {
   }
 
   async findOne(blog_id: number) {
-    return this.database.query.blogs.findFirst({
+    return await this.database.query.blogs.findFirst({
       where: eq(schema.blogs.id, blog_id),
       with: {
         comments: true,

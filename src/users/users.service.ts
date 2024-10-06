@@ -29,7 +29,7 @@ export class UsersService {
   }
 
   async findAll() {
-    return this.database.query.users.findMany({});
+    return await this.database.query.users.findMany({});
   }
 
   async updateUser(user: User) {
