@@ -162,7 +162,7 @@ describe('BlogsService', () => {
       mockDatabase.query.blogs.findFirst.mockResolvedValue(blog);
       jest.spyOn(blogsService, 'isAuthor').mockResolvedValue(true);
 
-      await blogsService.remove('clerk_123', 1);
+      await blogsService.delete('clerk_123', 1);
 
       expect(mockDatabase.query.blogs.findFirst).toHaveBeenCalledWith({
         where: eq(schema.blogs.id, 1),
@@ -180,7 +180,7 @@ describe('BlogsService', () => {
     it('Should throw a not found exception when the blog does not exist', async () => {
       mockDatabase.query.blogs.findFirst.mockResolvedValue(undefined);
 
-      await expect(blogsService.remove('clerk_123', 1)).rejects.toThrow(
+      await expect(blogsService.delete('clerk_123', 1)).rejects.toThrow(
         'Blog not found',
       );
 
@@ -193,7 +193,7 @@ describe('BlogsService', () => {
       mockDatabase.query.blogs.findFirst.mockResolvedValue(blog);
       jest.spyOn(blogsService, 'isAuthor').mockResolvedValue(false);
 
-      await expect(blogsService.remove('clerk_124', 1)).rejects.toThrow(
+      await expect(blogsService.delete('clerk_124', 1)).rejects.toThrow(
         'Action denied',
       );
 

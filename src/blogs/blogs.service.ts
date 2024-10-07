@@ -69,7 +69,7 @@ export class BlogsService {
       .where(eq(schema.blogs.id, blog.id));
   }
 
-  async remove(author_id: string, id: number) {
+  async delete(author_id: string, id: number) {
     const existing_blog = await this.database.query.blogs.findFirst({
       where: eq(schema.blogs.id, id),
     });

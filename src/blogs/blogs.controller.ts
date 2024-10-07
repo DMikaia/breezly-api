@@ -37,7 +37,7 @@ export class BlogsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @Req() req: ClerkRequest) {
-    return this.blogsService.remove(req.clerk_id, +id);
+  delete(@Param('id') id: string, @Req() req: ClerkRequest) {
+    return this.blogsService.delete(req.clerk_id, +id);
   }
 }
