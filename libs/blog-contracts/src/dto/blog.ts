@@ -14,6 +14,7 @@ export class CreateBlog {
 }
 
 export class UpdateBlog {
+  id: number;
   title: string;
   thumbnail: string;
   content: string;

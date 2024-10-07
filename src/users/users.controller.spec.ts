@@ -52,7 +52,7 @@ describe('UsersController', () => {
     it('should throw an unauthorized error with an undefined result', async () => {
       jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
 
-      expect(await usersController.findAll()).toEqual(undefined);
+      expect(await usersController.findAll()).toBeUndefined();
     });
 
     it('should return a 200 status with the list of users', async () => {
@@ -76,7 +76,7 @@ describe('UsersController', () => {
     it('should throw an unauthorized error with an undefined result', async () => {
       jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
 
-      expect(await usersController.findOne(1)).toEqual(undefined);
+      expect(await usersController.findOne(1)).toBeUndefined();
     });
 
     it('should return a 200 status with the user public information', async () => {
@@ -102,9 +102,9 @@ describe('UsersController', () => {
         .spyOn(ClerkHttpGuard.prototype, 'canActivate')
         .mockResolvedValue(false);
 
-      expect(await usersController.handleClerkEvent(create_body)).toEqual(
-        undefined,
-      );
+      expect(
+        await usersController.handleClerkEvent(create_body),
+      ).toBeUndefined();
     });
 
     it('should throw a bad request error with an undefined result', async () => {
@@ -113,9 +113,9 @@ describe('UsersController', () => {
         .mockResolvedValue(true);
 
       mockClerkService.handleClerkEvent.mockReturnValue(undefined);
-      expect(await usersController.handleClerkEvent(wrong_body)).toEqual(
-        undefined,
-      );
+      expect(
+        await usersController.handleClerkEvent(wrong_body),
+      ).toBeUndefined();
     });
 
     it('should return a 200 status if the request is successful with an undefined result', async () => {
@@ -124,9 +124,9 @@ describe('UsersController', () => {
         .mockResolvedValue(true);
       mockClerkService.handleClerkEvent.mockReturnValue(undefined);
 
-      expect(await usersController.handleClerkEvent(create_body)).toEqual(
-        undefined,
-      );
+      expect(
+        await usersController.handleClerkEvent(create_body),
+      ).toBeUndefined();
       expect(clerkService.handleClerkEvent).toHaveBeenCalledWith(create_body);
     });
   });

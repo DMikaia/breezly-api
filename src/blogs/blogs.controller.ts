@@ -33,11 +33,11 @@ export class BlogsController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Req() req: ClerkRequest) {
-    return this.blogsService.update(+id, req.clerk_id, req.body);
+    return this.blogsService.update(req.clerk_id, { id: +id, ...req.body });
   }
 
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: ClerkRequest) {
-    return this.blogsService.remove(+id, req.clerk_id);
+    return this.blogsService.remove(req.clerk_id, +id);
   }
 }

@@ -5,13 +5,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { AuthorUtils, DATABASE_CONNECTION } from '@libs/common';
+import { DATABASE_CONNECTION } from '@libs/common';
 import { CreateBlog, UpdateBlog } from '@libs/blog-contracts';
 import { eq } from 'drizzle-orm';
 import * as schema from '@libs/common/schema/blogs';
 
 @Injectable()
-export class BlogsService implements AuthorUtils {
+export class BlogsService {
   constructor(
     @Inject(DATABASE_CONNECTION)
     private readonly database: NodePgDatabase<typeof schema>,
@@ -34,16 +34,24 @@ export class BlogsService implements AuthorUtils {
   }
 
   async findOne(blog_id: number) {
-    return await this.database.query.blogs.findFirst({
+    const blog = await this.database.query.blogs.findFirst({
       where: eq(schema.blogs.id, blog_id),
       with: {
         comments: true,
       },
     });
+
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
+
+    return blog;
   }
 
-  async update(id: number, author_id: string, blog: UpdateBlog) {
-    const existing_blog = await this.findOne(id);
+  async update(author_id: string, blog: UpdateBlog) {
+    const existing_blog = await this.database.query.blogs.findFirst({
+      where: eq(schema.blogs.id, blog.id),
+    });
 
     if (!existing_blog) {
       throw new NotFoundException('Blog not found');
@@ -58,11 +66,13 @@ export class BlogsService implements AuthorUtils {
     await this.database
       .update(schema.blogs)
       .set(blog)
-      .where(eq(schema.blogs.id, id));
+      .where(eq(schema.blogs.id, blog.id));
   }
 
-  async remove(id: number, author_id: string) {
-    const existing_blog = await this.findOne(id);
+  async remove(author_id: string, id: number) {
+    const existing_blog = await this.database.query.blogs.findFirst({
+      where: eq(schema.blogs.id, id),
+    });
 
     if (!existing_blog) {
       throw new NotFoundException('Blog not found');
