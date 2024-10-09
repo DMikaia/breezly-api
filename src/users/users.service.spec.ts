@@ -4,6 +4,7 @@ import { DATABASE_CONNECTION } from '@libs/common';
 import { mapped_user } from '@libs/user-contracts';
 import { eq } from 'drizzle-orm';
 import * as schema from '@libs/common/schema/users';
+import { NotFoundException } from '@nestjs/common';
 
 const mockDatabase = {
   query: {
@@ -73,6 +74,16 @@ describe('UsersService', () => {
       const users = await usersService.findOne(1);
 
       expect(users).toEqual(mockUser);
+      expect(mockDatabase.query.users.findFirst).toHaveBeenCalledWith({
+        where: eq(schema.users.id, 1),
+      });
+    });
+
+    it('should throw a not found exception if the user does not exist', async () => {
+      mockDatabase.query.users.findFirst.mockResolvedValue(null);
+
+      await expect(usersService.findOne(1)).rejects.toThrow(NotFoundException);
+
       expect(mockDatabase.query.users.findFirst).toHaveBeenCalledWith({
         where: eq(schema.users.id, 1),
       });

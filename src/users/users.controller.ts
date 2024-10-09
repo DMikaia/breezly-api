@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@libs/common';
 import { ClerkHttpGuard, Data } from '@libs/clerk-contracts';
+import { UserDto } from '@libs/user-contracts';
 import { UsersService } from './users.service';
 import { ClerkService } from './clerk.service';
 
@@ -24,21 +25,33 @@ export class UsersController {
   @UseGuards(ClerkHttpGuard)
   @HttpCode(HttpStatus.OK)
   @Post('clerk')
-  async handleClerkEvent(@Body() body: Data) {
-    return await this.clerkService.handleClerkEvent(body);
+  async handleClerkEvent(@Body() body: Data): Promise<void> {
+    try {
+      return await this.clerkService.handleClerkEvent(body);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   @Get()
-  async findAll() {
-    return await this.usersService.findAll();
+  async findAll(): Promise<UserDto[]> {
+    try {
+      return await this.usersService.findAll();
+    } catch (error) {
+      throw error;
+    }
   }
 
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   @Get(':id')
-  async findOne(@Param('id', new ParseIntPipe()) id: number) {
-    return await this.usersService.findOne(id);
+  async findOne(@Param('id', new ParseIntPipe()) id: number): Promise<UserDto> {
+    try {
+      return await this.usersService.findOne(id);
+    } catch (error) {
+      throw error;
+    }
   }
 }
