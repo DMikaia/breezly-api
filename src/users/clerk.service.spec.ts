@@ -3,6 +3,7 @@ import { mapped_user } from '@libs/user-contracts';
 import { ClerkService } from './clerk.service';
 import { UsersService } from './users.service';
 import { mockUsersService } from '@libs/user-contracts';
+import { BadRequestException } from '@nestjs/common';
 import {
   ClerkUser,
   create_body,
@@ -62,7 +63,7 @@ describe('ClerkService', () => {
 
     it('random.event: should throw a bad request when the event is not recognized', async () => {
       await expect(clerkService.handleClerkEvent(wrong_body)).rejects.toThrow(
-        'Invalid event type',
+        BadRequestException,
       );
     });
   });

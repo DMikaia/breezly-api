@@ -28,7 +28,7 @@ export class ClerkHttpGuard implements CanActivate {
       !headers.svix_timestamp ||
       !headers.svix_signature
     ) {
-      throw new UnauthorizedException('Missing signature headers');
+      throw new UnauthorizedException('Unauthorized');
     }
 
     const isValid = this.validationStrategy.validate({
@@ -37,7 +37,7 @@ export class ClerkHttpGuard implements CanActivate {
     });
 
     if (!isValid) {
-      throw new UnauthorizedException('Invalid signature');
+      throw new UnauthorizedException('Unauthorized');
     }
 
     return true;

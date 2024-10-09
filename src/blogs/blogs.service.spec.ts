@@ -3,7 +3,7 @@ import { BlogsService } from './blogs.service';
 import { DATABASE_CONNECTION } from '@libs/common';
 import { blog, blog_dto } from '@libs/blog-contracts';
 import * as schema from '@libs/common/schema/blogs';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 const mockDatabase = {
   query: {
@@ -51,159 +51,120 @@ describe('BlogsService', () => {
   });
 
   describe('Create', () => {
-    it('Should create a new blog', async () => {
+    describe('When create is called', () => {
+      let result;
       const author_id = 'clerk_123';
 
-      await blogsService.create(author_id, blog_dto);
+      beforeEach(async () => {
+        result = await blogsService.create(author_id, blog_dto);
+      });
 
-      expect(mockDatabase.insert).toHaveBeenCalledWith(schema.blogs);
-      expect(mockDatabase.insert().values).toHaveBeenCalledWith({
-        author_id,
-        ...blog_dto,
+      test('then it should call the database create to add a new blog', async () => {
+        expect(mockDatabase.insert).toHaveBeenCalledWith(schema.blogs);
+        expect(mockDatabase.insert().values).toHaveBeenCalledWith({
+          author_id,
+          ...blog_dto,
+        });
+      });
+
+      test('then it will create the new blog and return nothing', () => {
+        expect(result).toBeUndefined();
       });
     });
   });
 
   describe('Find all', () => {
-    it('It should return an array of blog', async () => {
-      const mockBlogs = [blog];
+    describe('When find all is called', () => {
+      let result: (typeof blog)[];
 
-      mockDatabase.query.blogs.findMany.mockResolvedValue(mockBlogs);
+      beforeEach(async () => {
+        mockDatabase.query.blogs.findMany.mockResolvedValue([blog]);
+        result = await blogsService.findAll();
+      });
 
-      const result = await blogsService.findAll();
+      test('then it should call the database find many to get the blog', async () => {
+        expect(mockDatabase.query.blogs.findMany).toHaveBeenCalledTimes(1);
+      });
 
-      expect(result).toEqual(mockBlogs);
-      expect(mockDatabase.query.blogs.findMany).toHaveBeenCalledTimes(1);
+      test('then it should return the blog list', async () => {
+        expect(result).toEqual([blog]);
+      });
     });
   });
 
   describe('Find one', () => {
-    it('It should return a blog if it exists', async () => {
-      mockDatabase.query.blogs.findFirst.mockResolvedValue(blog);
+    describe('When find one is call', () => {
+      let result: typeof blog;
 
-      const result = await blogsService.findOne(1);
+      beforeEach(async () => {
+        mockDatabase.query.blogs.findFirst.mockResolvedValue(blog);
+        result = await blogsService.findOne(1);
+      });
 
-      expect(result).toEqual(blog);
-      expect(mockDatabase.query.blogs.findFirst).toHaveBeenCalledWith({
-        where: eq(schema.blogs.id, 1),
-        with: {
-          comments: true,
-        },
+      test('then it should call the database find first to get the blog', async () => {
+        expect(mockDatabase.query.blogs.findFirst).toHaveBeenCalledWith({
+          where: eq(schema.blogs.id, 1),
+          with: {
+            comments: true,
+          },
+        });
+      });
+
+      test('then it should return the blog', async () => {
+        expect(result).toEqual(blog);
       });
     });
 
-    it('Should throw a not found exception when the blog is not found', async () => {
-      mockDatabase.query.blogs.findFirst.mockResolvedValue(undefined);
+    describe('When it fails, it will throw an exception', () => {
+      beforeEach(async () => {
+        mockDatabase.query.blogs.findFirst.mockResolvedValue(undefined);
+        await expect(blogsService.findOne(1)).rejects.toThrow('Blog not found');
+      });
 
-      await expect(blogsService.findOne(1)).rejects.toThrow('Blog not found');
-
-      expect(mockDatabase.query.blogs.findFirst).toHaveBeenCalledWith({
-        where: eq(schema.blogs.id, 1),
-        with: {
-          comments: true,
-        },
+      test('should call the database find first to get the blog', async () => {
+        expect(mockDatabase.query.blogs.findFirst).toHaveBeenCalledWith({
+          where: eq(schema.blogs.id, 1),
+          with: {
+            comments: true,
+          },
+        });
       });
     });
   });
 
   describe('Update', () => {
-    it('Should update a blog when the blog exist and it is the author', async () => {
+    describe('When update is called', () => {
       const mockUpdate = { id: 1, ...blog_dto };
-      mockDatabase.query.blogs.findFirst.mockResolvedValue(blog);
-      jest.spyOn(blogsService, 'isAuthor').mockResolvedValue(true);
 
-      await blogsService.update('clerk_123', mockUpdate);
-
-      expect(mockDatabase.query.blogs.findFirst).toHaveBeenCalledWith({
-        where: eq(schema.blogs.id, 1),
+      beforeEach(async () => {
+        await blogsService.update('clerk_123', mockUpdate);
       });
-      expect(blogsService.isAuthor).toHaveBeenCalledWith(
-        blog.author_id,
-        'clerk_123',
-      );
-      expect(mockDatabase.update).toHaveBeenCalledWith(schema.blogs);
-      expect(mockDatabase.update().set).toHaveBeenCalledWith(mockUpdate);
-      expect(mockDatabase.update().set().where).toHaveBeenCalledWith(
-        eq(schema.blogs.id, mockUpdate.id),
-      );
-    });
 
-    it('Should throw a not found exception when the blog does not exist', async () => {
-      mockDatabase.query.blogs.findFirst.mockResolvedValue(undefined);
-
-      await expect(
-        blogsService.update('clerk_123', { id: 1, ...blog_dto }),
-      ).rejects.toThrow('Blog not found');
-      expect(mockDatabase.query.blogs.findFirst).toHaveBeenCalledWith({
-        where: eq(schema.blogs.id, 1),
+      test('should call database to update the blog', async () => {
+        expect(mockDatabase.update).toHaveBeenCalledWith(schema.blogs);
+        expect(mockDatabase.update().set).toHaveBeenCalledWith(mockUpdate);
+        expect(mockDatabase.update().set().where).toHaveBeenCalledWith(
+          and(
+            eq(schema.blogs.id, mockUpdate.id),
+            eq(schema.blogs.author_id, 'clerk_123'),
+          ),
+        );
       });
-    });
-
-    it('Should throw an unauthorized exception when the blog exist but it is not the author', async () => {
-      const mockUpdate = { id: 1, ...blog_dto };
-      mockDatabase.query.blogs.findFirst.mockResolvedValue(blog);
-      jest.spyOn(blogsService, 'isAuthor').mockResolvedValue(false);
-
-      await expect(
-        blogsService.update('clerk_124', mockUpdate),
-      ).rejects.toThrow('Action denied');
-      expect(mockDatabase.query.blogs.findFirst).toHaveBeenCalledWith({
-        where: eq(schema.blogs.id, 1),
-      });
-      expect(blogsService.isAuthor).toHaveBeenCalledWith(
-        blog.author_id,
-        'clerk_124',
-      );
     });
   });
 
   describe('Delete', () => {
-    it('Should delete a blog when the blog exist and it is the author', async () => {
-      mockDatabase.query.blogs.findFirst.mockResolvedValue(blog);
-      jest.spyOn(blogsService, 'isAuthor').mockResolvedValue(true);
-
-      await blogsService.delete('clerk_123', 1);
-
-      expect(mockDatabase.query.blogs.findFirst).toHaveBeenCalledWith({
-        where: eq(schema.blogs.id, 1),
+    describe('When delete is called', () => {
+      beforeEach(async () => {
+        await blogsService.delete('clerk_123', 1);
       });
-      expect(blogsService.isAuthor).toHaveBeenCalledWith(
-        blog.author_id,
-        'clerk_123',
-      );
-      expect(mockDatabase.delete).toHaveBeenCalledWith(schema.blogs);
-      expect(mockDatabase.delete().where).toHaveBeenCalledWith(
-        eq(schema.blogs.id, 1),
-      );
-    });
 
-    it('Should throw a not found exception when the blog does not exist', async () => {
-      mockDatabase.query.blogs.findFirst.mockResolvedValue(undefined);
-
-      await expect(blogsService.delete('clerk_123', 1)).rejects.toThrow(
-        'Blog not found',
-      );
-
-      expect(mockDatabase.query.blogs.findFirst).toHaveBeenCalledWith({
-        where: eq(schema.blogs.id, 1),
+      test('should call database to delete the blog', async () => {
+        expect(mockDatabase.delete).toHaveBeenCalledWith(schema.blogs);
+        expect(mockDatabase.delete().where).toHaveBeenCalledWith(
+          and(eq(schema.blogs.id, 1), eq(schema.blogs.author_id, 'clerk_123')),
+        );
       });
-    });
-
-    it('Should throw an unauthorized exception when the blog exist but it is not the author', async () => {
-      mockDatabase.query.blogs.findFirst.mockResolvedValue(blog);
-      jest.spyOn(blogsService, 'isAuthor').mockResolvedValue(false);
-
-      await expect(blogsService.delete('clerk_124', 1)).rejects.toThrow(
-        'Action denied',
-      );
-
-      expect(mockDatabase.query.blogs.findFirst).toHaveBeenCalledWith({
-        where: eq(schema.blogs.id, 1),
-      });
-      expect(blogsService.isAuthor).toHaveBeenCalledWith(
-        blog.author_id,
-        'clerk_124',
-      );
     });
   });
 });

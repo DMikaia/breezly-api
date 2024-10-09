@@ -4,6 +4,7 @@ import { BlogsService } from './blogs.service';
 import { ConfigModule } from '@nestjs/config';
 import { AuthGuard, blogs, ClerkRequest, DatabaseModule } from '@libs/common';
 import { blog, blog_dto, mockBlogsService } from '@libs/blog-contracts';
+import { NotFoundException } from '@nestjs/common';
 
 describe('BlogsController', () => {
   let blogsController: BlogsController;
@@ -28,87 +29,134 @@ describe('BlogsController', () => {
   });
 
   describe('Create', () => {
-    it('Should throw an unauthorized error with an undefined result', async () => {
-      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
+    const req: unknown = {
+      cookies: { session_id: 'session_123' },
+      clerk_id: 'clerK_123',
+      body: blog_dto,
+      get: jest.fn(),
+      header: jest.fn(),
+    };
 
-      const req: unknown = {
-        cookies: { session_id: 'session_123' },
-        clerk_id: 'clerK_123',
-        body: blog_dto,
-        get: jest.fn(),
-        header: jest.fn(),
-      };
+    const casted_request = req as ClerkRequest;
 
-      const casted_request = req as ClerkRequest;
+    describe('When create is called', () => {
+      let result: void | undefined;
 
-      expect(await blogsController.create(casted_request)).toBeUndefined();
+      beforeEach(async () => {
+        jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
+        mockBlogsService.create.mockReturnValue(undefined);
+        result = await blogsController.create(casted_request);
+      });
+
+      test('then it should call the create service', async () => {
+        expect(blogsService.create).toHaveBeenCalledWith(
+          casted_request.clerk_id,
+          casted_request.body,
+        );
+      });
+
+      test('then it should return undefined', async () => {
+        expect(result).toBeUndefined();
+      });
     });
 
-    it('should create a new blog', async () => {
-      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
-      mockBlogsService.create.mockReturnValue(undefined);
+    describe('When the guard rejects the request', () => {
+      let result: undefined | void;
 
-      const req: unknown = {
-        cookies: { session_id: 'session_123' },
-        clerk_id: 'clerK_123',
-        body: blog_dto,
-        get: jest.fn(),
-        header: jest.fn(),
-      };
+      beforeEach(async () => {
+        jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
+        result = await blogsController.create(casted_request);
+      });
 
-      const casted_request = req as ClerkRequest;
-
-      expect(await blogsController.create(casted_request)).toBeUndefined();
-      expect(blogsService.create).toHaveBeenCalledWith(
-        casted_request.clerk_id,
-        casted_request.body,
-      );
+      test('then is should return undefined', async () => {
+        expect(result).toBeUndefined();
+      });
     });
   });
 
   describe('Find all', () => {
-    it('Should throw an unauthorized error with an undefined result', async () => {
-      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
+    describe('When find all is called', () => {
+      let result: (typeof blog)[];
 
-      expect(await blogsController.findAll()).toBeUndefined();
+      beforeEach(async () => {
+        jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
+        mockBlogsService.findAll.mockReturnValue(blogs);
+
+        result = await blogsController.findAll();
+      });
+
+      test('then it should call the find all service', async () => {
+        expect(blogsService.findAll).toHaveBeenCalled();
+      });
+
+      test('then it should return the list of blogs', async () => {
+        expect(result).toEqual(blogs);
+      });
     });
 
-    it('should return a list of blog', async () => {
-      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
-      mockBlogsService.findAll.mockReturnValue(blogs);
+    describe('When the guard rejects the request', () => {
+      let result: (typeof blog)[];
 
-      const result = await blogsController.findAll();
+      beforeEach(async () => {
+        mockBlogsService.findAll.mockReturnValue(undefined);
+        jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
+        result = await blogsController.findAll();
+      });
 
-      expect(result).toEqual(blogs);
-      expect(blogsService.findAll).toHaveBeenCalled();
+      test('then is should return undefined', async () => {
+        expect(result).toBeUndefined();
+      });
     });
   });
 
   describe('Find one', () => {
-    it('Should throw an unauthorized error with an undefined result', async () => {
-      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
+    describe('When find one is called', () => {
+      let result: typeof blog;
 
-      expect(await blogsController.findOne('1')).toBeUndefined();
+      beforeEach(async () => {
+        jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
+        mockBlogsService.findOne.mockReturnValue(blog);
+
+        result = await blogsController.findOne('1');
+      });
+
+      test('then it should call the find one service', async () => {
+        expect(blogsService.findOne).toHaveBeenCalledWith(1);
+      });
+
+      test('then it should return the blog', async () => {
+        expect(result).toEqual(blog);
+      });
     });
 
-    it('Should throw in the response a 404 and return undefined to the controller', async () => {
-      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
-      mockBlogsService.findOne.mockReturnValue(undefined);
+    describe('When the blog is not found', () => {
+      beforeEach(async () => {
+        jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
+        mockBlogsService.findOne.mockRejectedValue(
+          new NotFoundException('Blog not found'),
+        );
+        await expect(blogsController.findOne('1')).rejects.toThrow(
+          NotFoundException,
+        );
+      });
 
-      const result = await blogsController.findOne('1');
-
-      expect(result).toBeUndefined();
-      expect(blogsService.findOne).toHaveBeenCalledWith(1);
+      test('then it should call the find one service', () => {
+        expect(blogsService.findOne).toHaveBeenCalledWith(1);
+      });
     });
 
-    it('Should return a blog', async () => {
-      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
-      mockBlogsService.findOne.mockReturnValue(blog);
+    describe('When the guard reject the request', () => {
+      let result: typeof blog;
 
-      const result = await blogsController.findOne('1');
+      beforeEach(async () => {
+        jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
+        mockBlogsService.findOne.mockReturnValue(undefined);
+        result = await blogsController.findOne('1');
+      });
 
-      expect(result).toEqual(blog);
-      expect(blogsService.findOne).toHaveBeenCalledWith(1);
+      test('then is should return undefined', async () => {
+        expect(result).toBeUndefined();
+      });
     });
   });
 
@@ -123,36 +171,39 @@ describe('BlogsController', () => {
 
     const casted_request = req as ClerkRequest;
 
-    it('Should throw an unauthorized error with an undefined result', async () => {
-      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
+    describe('When update is called', () => {
+      let result: void | undefined;
 
-      expect(await blogsController.update('1', casted_request)).toBeUndefined();
+      beforeEach(async () => {
+        jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
+        mockBlogsService.update.mockReturnValue(undefined);
+
+        result = await blogsController.update('1', casted_request);
+      });
+
+      test('then it should call the update service', async () => {
+        expect(blogsService.update).toHaveBeenCalledWith(
+          'clerk_123',
+          casted_request.body,
+        );
+      });
+
+      test('then it should return undefined on success', async () => {
+        expect(result).toBeUndefined();
+      });
     });
 
-    it('Should throw in the response an http exception when the operation failed either 404 or 403', async () => {
-      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
-      mockBlogsService.findOne.mockReturnValue(undefined);
+    describe('When the guard rejects the request', () => {
+      let result: void | undefined;
 
-      const result = await blogsController.update('1', casted_request);
+      beforeEach(async () => {
+        jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
+        result = await blogsController.update('1', casted_request);
+      });
 
-      expect(result).toBeUndefined();
-      expect(blogsService.update).toHaveBeenCalledWith(
-        'clerk_123',
-        casted_request.body,
-      );
-    });
-
-    it('Should send 200 response and return undefined to the controller', async () => {
-      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
-      mockBlogsService.update.mockReturnValue(undefined);
-
-      const result = await blogsController.update('1', casted_request);
-
-      expect(result).toBeUndefined();
-      expect(blogsService.update).toHaveBeenCalledWith(
-        'clerk_123',
-        casted_request.body,
-      );
+      test('then is should return undefined', async () => {
+        expect(result).toBeUndefined();
+      });
     });
   });
 
@@ -167,30 +218,36 @@ describe('BlogsController', () => {
 
     const casted_request = req as ClerkRequest;
 
-    it('Should throw an unauthorized error with an undefined result that the controller receives', async () => {
-      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
+    describe('When delete is called', () => {
+      let result: void | undefined;
 
-      expect(await blogsController.delete('1', casted_request)).toBeUndefined();
+      beforeEach(async () => {
+        jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
+        mockBlogsService.delete.mockReturnValue(undefined);
+
+        result = await blogsController.delete('1', casted_request);
+      });
+
+      test('then it should call the delete service', async () => {
+        expect(blogsService.delete).toHaveBeenCalledWith('clerk_123', 1);
+      });
+
+      test('then it should return undefined on success', async () => {
+        expect(result).toBeUndefined();
+      });
     });
 
-    it('Should throw in the response an http exception when the operation failed either 404 or 403', async () => {
-      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
-      mockBlogsService.delete.mockReturnValue(undefined);
+    describe('When the guard reject the request', () => {
+      let result: void | undefined;
 
-      const result = await blogsController.delete('1', casted_request);
+      beforeEach(async () => {
+        jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
+        result = await blogsController.delete('1', casted_request);
+      });
 
-      expect(result).toBeUndefined();
-      expect(blogsService.delete).toHaveBeenCalledWith('clerk_123', 1);
-    });
-
-    it('Should send 200 response and remove the blog and return undefined to the controller', async () => {
-      jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
-      mockBlogsService.delete.mockReturnValue(undefined);
-
-      const result = await blogsController.delete('1', casted_request);
-
-      expect(result).toBeUndefined();
-      expect(blogsService.delete).toHaveBeenCalledWith('clerk_123', 1);
+      test('then is should return undefined', async () => {
+        expect(result).toBeUndefined();
+      });
     });
   });
 });

@@ -26,32 +26,20 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @Post('clerk')
   async handleClerkEvent(@Body() body: Data): Promise<void> {
-    try {
-      return await this.clerkService.handleClerkEvent(body);
-    } catch (error) {
-      throw error;
-    }
+    return await this.clerkService.handleClerkEvent(body);
   }
 
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   @Get()
   async findAll(): Promise<UserDto[]> {
-    try {
-      return await this.usersService.findAll();
-    } catch (error) {
-      throw error;
-    }
+    return await this.usersService.findAll();
   }
 
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   @Get(':id')
   async findOne(@Param('id', new ParseIntPipe()) id: number): Promise<UserDto> {
-    try {
-      return await this.usersService.findOne(id);
-    } catch (error) {
-      throw error;
-    }
+    return await this.usersService.findOne(id);
   }
 }
