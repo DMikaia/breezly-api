@@ -42,6 +42,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/blog-contracts/tsconfig.lib.json"
       }
+    },
+    "comment-contracts": {
+      "type": "library",
+      "root": "libs/comment-contracts",
+      "entryFile": "index",
+      "sourceRoot": "libs/comment-contracts/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/comment-contracts/tsconfig.lib.json"
+      }
     }
   }
 }

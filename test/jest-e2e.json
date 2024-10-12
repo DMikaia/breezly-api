@@ -18,6 +18,8 @@
     "@libs/user-contracts/(.*)": "<rootDir>/../libs/user-contracts/src/$1",
     "@libs/user-contracts": "<rootDir>/../libs/user-contracts/src",
     "@libs/blog-contracts/(.*)": "<rootDir>/../libs/blog-contracts/src/$1",
-    "@libs/blog-contracts": "<rootDir>/../libs/blog-contracts/src"
+    "@libs/blog-contracts": "<rootDir>/../libs/blog-contracts/src",
+    "@libs/comment-contracts/(.*)": "<rootDir>/../libs/comment-contracts/src/$1",
+    "@libs/comment-contracts": "<rootDir>/../libs/comment-contracts/src"
   }
 }
