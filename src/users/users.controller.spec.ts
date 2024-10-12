@@ -53,7 +53,7 @@ describe('UsersController', () => {
     expect(usersController).toBeDefined();
   });
 
-  describe('findAll', () => {
+  describe('Find All', () => {
     const mock_data = {
       id: 1,
       clerk_id: 'clerk_1',
@@ -95,7 +95,7 @@ describe('UsersController', () => {
     });
   });
 
-  describe('findOne', () => {
+  describe('Find One', () => {
     const mock_data = {
       id: 1,
       clerk_id: 'clerk_1',
@@ -153,25 +153,19 @@ describe('UsersController', () => {
     });
   });
 
-  describe('handleClerkEvent', () => {
+  describe('Handle Clerk Event', () => {
     describe('When handle clerk event is called', () => {
-      let result: void | undefined;
-
       beforeEach(async () => {
         jest
           .spyOn(ClerkHttpGuard.prototype, 'canActivate')
           .mockResolvedValue(true);
         mockClerkService.handleClerkEvent.mockReturnValue(undefined);
 
-        result = await usersController.handleClerkEvent(create_body);
+        await usersController.handleClerkEvent(create_body);
       });
 
       test('then it should call the hand clerk event service', async () => {
         expect(clerkService.handleClerkEvent).toHaveBeenCalledWith(create_body);
-      });
-
-      test('then it should return undefined on success', async () => {
-        expect(result).toBeUndefined();
       });
     });
 

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '@libs/common';
 import { Comment, CommentDto } from '@libs/comment-contracts';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
@@ -13,10 +13,16 @@ export class CommentsService {
   ) {}
 
   async findOne(comment_id: number): Promise<CommentDto> {
-    return this.database.query.comments.findFirst({
+    const comment = await this.database.query.comments.findFirst({
       where: eq(schema.comments.id, comment_id),
       with: {},
     });
+
+    if (!comment) {
+      throw new NotFoundException('Comment not found');
+    }
+
+    return comment;
   }
 
   async findAll(

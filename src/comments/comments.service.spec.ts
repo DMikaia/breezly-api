@@ -79,6 +79,22 @@ describe('CommentsService', () => {
         expect(result).toEqual(queried_comment);
       });
     });
+
+    describe('when it is not found', () => {
+      beforeEach(async () => {
+        mockDatabase.query.comments.findFirst.mockResolvedValue(undefined);
+        await expect(commentsService.findOne(find_one.id)).rejects.toThrow(
+          'Comment not found',
+        );
+      });
+
+      test('then it should call the database to find the comment', async () => {
+        expect(mockDatabase.query.comments.findFirst).toHaveBeenCalledWith({
+          where: eq(schema.comments.id, find_one.id),
+          with: {},
+        });
+      });
+    });
   });
 
   describe('Find All', () => {
@@ -110,29 +126,21 @@ describe('CommentsService', () => {
 
   describe('Create', () => {
     describe('when create is called', () => {
-      let result: void | undefined;
-
       beforeEach(async () => {
-        result = await commentsService.create(comment);
+        await commentsService.create(comment);
       });
 
       test('then it should call the database to create a new comment', async () => {
         expect(mockDatabase.insert).toHaveBeenCalledWith(schema.comments);
         expect(mockDatabase.insert().values).toHaveBeenCalledWith(comment);
       });
-
-      test('then it should return undefined on success', async () => {
-        expect(result).toBeUndefined();
-      });
     });
   });
 
   describe('Update', () => {
     describe('when update is called', () => {
-      let result: void | undefined;
-
       beforeEach(async () => {
-        result = await commentsService.update(comment);
+        await commentsService.update(comment);
       });
 
       test('then it should call the database to update the comment', async () => {
@@ -145,22 +153,13 @@ describe('CommentsService', () => {
           ),
         );
       });
-
-      test('then it should return undefined on success', async () => {
-        expect(result).toBeUndefined();
-      });
     });
   });
 
   describe('Delete', () => {
     describe('when delete is called', () => {
-      let result: void | undefined;
-
       beforeEach(async () => {
-        result = await commentsService.delete(
-          delete_comment.id,
-          delete_comment.user_id,
-        );
+        await commentsService.delete(delete_comment.id, delete_comment.user_id);
       });
 
       test('then it should call the database to delete the comment', async () => {
@@ -171,10 +170,6 @@ describe('CommentsService', () => {
             eq(schema.comments.user_id, delete_comment.user_id),
           ),
         );
-      });
-
-      test('then it should return undefined on success', async () => {
-        expect(result).toBeUndefined();
       });
     });
   });

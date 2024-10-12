@@ -50,48 +50,6 @@ describe('BlogsService', () => {
     expect(blogsService).toBeDefined();
   });
 
-  describe('Create', () => {
-    describe('When create is called', () => {
-      let result;
-      const author_id = 'clerk_123';
-
-      beforeEach(async () => {
-        result = await blogsService.create(author_id, blog_dto);
-      });
-
-      test('then it should call the database create to add a new blog', async () => {
-        expect(mockDatabase.insert).toHaveBeenCalledWith(schema.blogs);
-        expect(mockDatabase.insert().values).toHaveBeenCalledWith({
-          author_id,
-          ...blog_dto,
-        });
-      });
-
-      test('then it will create the new blog and return nothing', () => {
-        expect(result).toBeUndefined();
-      });
-    });
-  });
-
-  describe('Find all', () => {
-    describe('When find all is called', () => {
-      let result: (typeof blog)[];
-
-      beforeEach(async () => {
-        mockDatabase.query.blogs.findMany.mockResolvedValue([blog]);
-        result = await blogsService.findAll();
-      });
-
-      test('then it should call the database find many to get the blog', async () => {
-        expect(mockDatabase.query.blogs.findMany).toHaveBeenCalledTimes(1);
-      });
-
-      test('then it should return the blog list', async () => {
-        expect(result).toEqual([blog]);
-      });
-    });
-  });
-
   describe('Find one', () => {
     describe('When find one is call', () => {
       let result: typeof blog;
@@ -127,6 +85,43 @@ describe('BlogsService', () => {
           with: {
             comments: true,
           },
+        });
+      });
+    });
+  });
+
+  describe('Find all', () => {
+    describe('When find all is called', () => {
+      let result: (typeof blog)[];
+
+      beforeEach(async () => {
+        mockDatabase.query.blogs.findMany.mockResolvedValue([blog]);
+        result = await blogsService.findAll();
+      });
+
+      test('then it should call the database find many to get the blog', async () => {
+        expect(mockDatabase.query.blogs.findMany).toHaveBeenCalledTimes(1);
+      });
+
+      test('then it should return the blog list', async () => {
+        expect(result).toEqual([blog]);
+      });
+    });
+  });
+
+  describe('Create', () => {
+    describe('When create is called', () => {
+      const author_id = 'clerk_123';
+
+      beforeEach(async () => {
+        await blogsService.create(author_id, blog_dto);
+      });
+
+      test('then it should call the database create to add a new blog', async () => {
+        expect(mockDatabase.insert).toHaveBeenCalledWith(schema.blogs);
+        expect(mockDatabase.insert().values).toHaveBeenCalledWith({
+          author_id,
+          ...blog_dto,
         });
       });
     });

@@ -51,78 +51,112 @@ describe('UsersService', () => {
     expect(usersService).toBeDefined();
   });
 
-  describe('findAll', () => {
-    it('should return an array of users', async () => {
-      const mockUsers = [
-        { id: 1, clerk_id: 'clerk_1', email: 'user@example.com' },
-      ];
-      mockDatabase.query.users.findMany.mockResolvedValue(mockUsers);
+  describe('Find One', () => {
+    const mockUser = {
+      id: 1,
+      clerk_id: 'clerk_1',
+      email: 'user@example.com',
+    };
 
-      const users = await usersService.findAll();
+    describe('When find one is called', () => {
+      let user: typeof mockUser;
 
-      expect(users).toEqual(mockUsers);
-      expect(mockDatabase.query.users.findMany).toHaveBeenCalledTimes(1);
-    });
-  });
+      beforeEach(async () => {
+        mockDatabase.query.users.findFirst.mockResolvedValue(mockUser);
+        user = await usersService.findOne(1);
+      });
 
-  describe('findOne', () => {
-    it('should return a user with the provided user id', async () => {
-      const mockUser = {
-        id: 1,
-        clerk_id: 'clerk_1',
-        email: 'user@example.com',
-      };
+      test('then it should call the database to find the user', async () => {
+        expect(mockDatabase.query.users.findFirst).toHaveBeenCalledWith({
+          where: eq(schema.users.id, 1),
+        });
+      });
 
-      mockDatabase.query.users.findFirst.mockResolvedValue(mockUser);
-
-      const users = await usersService.findOne(1);
-
-      expect(users).toEqual(mockUser);
-      expect(mockDatabase.query.users.findFirst).toHaveBeenCalledWith({
-        where: eq(schema.users.id, 1),
+      test('then it should return the user', async () => {
+        expect(user).toEqual(mockUser);
       });
     });
 
-    it('should throw a not found exception if the user does not exist', async () => {
-      mockDatabase.query.users.findFirst.mockResolvedValue(null);
+    describe('should throw a not found exception if the user does not exist', () => {
+      beforeEach(async () => {
+        mockDatabase.query.users.findFirst.mockResolvedValue(null);
+        await expect(usersService.findOne(1)).rejects.toThrow(
+          NotFoundException,
+        );
+      });
 
-      await expect(usersService.findOne(1)).rejects.toThrow(NotFoundException);
-
-      expect(mockDatabase.query.users.findFirst).toHaveBeenCalledWith({
-        where: eq(schema.users.id, 1),
+      test('then it should call the database to find the user', async () => {
+        expect(mockDatabase.query.users.findFirst).toHaveBeenCalledWith({
+          where: eq(schema.users.id, 1),
+        });
       });
     });
   });
 
-  describe('createUser', () => {
-    it('should insert a user into the database', async () => {
-      await usersService.createUser(mapped_user);
+  describe('Find All', () => {
+    const mockUsers = [
+      { id: 1, clerk_id: 'clerk_1', email: 'user@example.com' },
+    ];
 
-      expect(mockDatabase.insert).toHaveBeenCalledWith(schema.users);
-      expect(mockDatabase.insert().values).toHaveBeenCalledWith(mapped_user);
+    describe('When find all is called', () => {
+      let users: typeof mockUsers;
+
+      beforeEach(async () => {
+        mockDatabase.query.users.findMany.mockResolvedValue(mockUsers);
+        users = await usersService.findAll();
+      });
+
+      test('then it should call the database to find all the users', async () => {
+        expect(mockDatabase.query.users.findMany).toHaveBeenCalledTimes(1);
+      });
+
+      test('then it should return the list of users', async () => {
+        expect(users).toEqual(mockUsers);
+      });
     });
   });
 
-  describe('updateUser', () => {
-    it('should update a user in the database', async () => {
-      await usersService.updateUser(mapped_user);
+  describe('Create', () => {
+    describe('should insert a user into the database', () => {
+      beforeEach(async () => {
+        await usersService.createUser(mapped_user);
+      });
 
-      expect(mockDatabase.update).toHaveBeenCalledWith(schema.users);
-      expect(mockDatabase.update().set).toHaveBeenCalledWith(mapped_user);
-      expect(mockDatabase.update().set().where).toHaveBeenCalledWith(
-        eq(schema.users.clerk_id, mapped_user.clerk_id),
-      );
+      test('the it should call the database to create the user', async () => {
+        expect(mockDatabase.insert).toHaveBeenCalledWith(schema.users);
+        expect(mockDatabase.insert().values).toHaveBeenCalledWith(mapped_user);
+      });
     });
   });
 
-  describe('deleteUser', () => {
-    it('should delete a user in the database', async () => {
-      await usersService.deleteUser(mapped_user.clerk_id);
+  describe('Update', () => {
+    describe('should update a user in the database', () => {
+      beforeEach(async () => {
+        await usersService.updateUser(mapped_user);
+      });
 
-      expect(mockDatabase.delete).toHaveBeenCalledWith(schema.users);
-      expect(mockDatabase.delete().where).toHaveBeenCalledWith(
-        eq(schema.users.clerk_id, mapped_user.clerk_id),
-      );
+      test('then is should call the database to update the user', () => {
+        expect(mockDatabase.update).toHaveBeenCalledWith(schema.users);
+        expect(mockDatabase.update().set).toHaveBeenCalledWith(mapped_user);
+        expect(mockDatabase.update().set().where).toHaveBeenCalledWith(
+          eq(schema.users.clerk_id, mapped_user.clerk_id),
+        );
+      });
+    });
+  });
+
+  describe('Delete', () => {
+    describe('should delete a user in the database', () => {
+      beforeEach(async () => {
+        await usersService.deleteUser(mapped_user.clerk_id);
+      });
+
+      test('then it should call the database to delete the user', () => {
+        expect(mockDatabase.delete).toHaveBeenCalledWith(schema.users);
+        expect(mockDatabase.delete().where).toHaveBeenCalledWith(
+          eq(schema.users.clerk_id, mapped_user.clerk_id),
+        );
+      });
     });
   });
 });

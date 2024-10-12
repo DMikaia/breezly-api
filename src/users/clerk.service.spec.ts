@@ -34,45 +34,62 @@ describe('ClerkService', () => {
     expect(clerkService).toBeDefined();
   });
 
-  describe('handleClerkEvent', () => {
-    it('user.created: should create a new user', async () => {
-      mockUsersService.createUser.mockReturnValue(undefined);
+  describe('Handle Clerk Event', () => {
+    describe('When user.created is the case', () => {
+      beforeEach(async () => {
+        mockUsersService.createUser.mockReturnValue(undefined);
+        await clerkService.handleClerkEvent(create_body);
+      });
 
-      await clerkService.handleClerkEvent(create_body);
-
-      expect(mockUsersService.createUser).toHaveBeenCalledWith(mapped_user);
+      test('then is should call the create method from the user service', async () => {
+        expect(mockUsersService.createUser).toHaveBeenCalledWith(mapped_user);
+      });
     });
 
-    it('user.updated: should update an existing user', async () => {
-      mockUsersService.updateUser.mockReturnValue(undefined);
+    describe('When user.updated is the case', () => {
+      beforeEach(async () => {
+        mockUsersService.updateUser.mockReturnValue(undefined);
+        await clerkService.handleClerkEvent(update_body);
+      });
 
-      await clerkService.handleClerkEvent(update_body);
-
-      expect(mockUsersService.updateUser).toHaveBeenCalledWith(mapped_user);
+      test('then is should call the update method from the user service', async () => {
+        expect(mockUsersService.updateUser).toHaveBeenCalledWith(mapped_user);
+      });
     });
 
-    it('user.deleted: should delete an existing user', async () => {
-      mockUsersService.deleteUser.mockReturnValue(undefined);
+    describe('When user.deleted is the case', () => {
+      beforeEach(async () => {
+        mockUsersService.deleteUser.mockReturnValue(undefined);
+        await clerkService.handleClerkEvent(delete_body);
+      });
 
-      await clerkService.handleClerkEvent(delete_body);
-
-      expect(mockUsersService.deleteUser).toHaveBeenCalledWith(
-        mapped_user.clerk_id,
-      );
+      test('then is should call the delete method from the user service', async () => {
+        expect(mockUsersService.deleteUser).toHaveBeenCalledWith(
+          mapped_user.clerk_id,
+        );
+      });
     });
 
-    it('random.event: should throw a bad request when the event is not recognized', async () => {
-      await expect(clerkService.handleClerkEvent(wrong_body)).rejects.toThrow(
-        BadRequestException,
-      );
+    describe('When it is not a valid event', () => {
+      test('the it should throw a bad request exception', async () => {
+        await expect(clerkService.handleClerkEvent(wrong_body)).rejects.toThrow(
+          BadRequestException,
+        );
+      });
     });
   });
 
-  describe('mapUser', () => {
-    it('should return a mapped user data', () => {
-      const result = clerkService.mapUser(create_body.data as ClerkUser);
+  describe('Map User', () => {
+    describe('When map user is called', () => {
+      let result: typeof mapped_user;
 
-      expect(result).toEqual(mapped_user);
+      beforeEach(async () => {
+        result = clerkService.mapUser(create_body.data as ClerkUser);
+      });
+
+      test('then it should return a mapped user', async () => {
+        expect(result).toEqual(mapped_user);
+      });
     });
   });
 });
