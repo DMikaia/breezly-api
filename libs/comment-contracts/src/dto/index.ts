@@ -1,6 +1,7 @@
 export class Comment {
   blog_id: number;
   content: string;
+  user_id: string;
 }
 
 export class CommentDto {

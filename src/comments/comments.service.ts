@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '@libs/common';
-import { Comment } from '@libs/comment-contracts';
+import { Comment, CommentDto } from '@libs/comment-contracts';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '@libs/common/schema/comments';
 import { and, eq } from 'drizzle-orm';
@@ -12,30 +12,39 @@ export class CommentsService {
     private readonly database: NodePgDatabase<typeof schema>,
   ) {}
 
-  async findOne(comment_id: number) {
+  async findOne(comment_id: number): Promise<CommentDto> {
     return this.database.query.comments.findFirst({
       where: eq(schema.comments.id, comment_id),
+      with: {},
     });
   }
 
-  async findAll(blog_id: number, limit: number, offset: number) {
+  async findAll(
+    blog_id: number,
+    limit: number,
+    offset: number,
+  ): Promise<CommentDto[]> {
     return this.database.query.comments.findMany({
       where: eq(schema.comments.blog_id, blog_id),
       limit,
       offset,
+      with: {},
     });
   }
 
-  async create(user_id: string, comment: Comment) {
-    await this.database.insert(schema.comments).values({ user_id, ...comment });
+  async create(comment: Comment) {
+    await this.database.insert(schema.comments).values(comment);
   }
 
-  async update(id: number, user_id: string, comment: Comment) {
+  async update(comment: Comment) {
     await this.database
       .update(schema.comments)
-      .set({ user_id, ...comment })
+      .set(comment)
       .where(
-        and(eq(schema.comments.id, id), eq(schema.comments.user_id, user_id)),
+        and(
+          eq(schema.comments.id, comment.blog_id),
+          eq(schema.comments.user_id, comment.user_id),
+        ),
       );
   }
 
