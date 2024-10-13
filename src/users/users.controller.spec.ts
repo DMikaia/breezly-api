@@ -79,18 +79,12 @@ describe('UsersController', () => {
     });
 
     describe('When the guard rejects the request', () => {
-      let result: undefined | (typeof mock_data)[];
-
-      beforeEach(async () => {
+      test('then it should throw an unauthorized exception', async () => {
         jest
           .spyOn(AuthGuard.prototype, 'canActivate')
           .mockRejectedValue(new UnauthorizedException('Unauthorized'));
         mockUsersService.findAll.mockReturnValue(undefined);
-        result = await usersController.findAll();
-      });
-
-      test('then it should return undefined', async () => {
-        expect(result).toBeUndefined();
+        expect(await usersController.findAll()).toBeUndefined();
       });
     });
   });
@@ -137,18 +131,12 @@ describe('UsersController', () => {
     });
 
     describe('When the guard rejects the request', () => {
-      let result: undefined | typeof mock_data;
-
-      beforeEach(async () => {
+      test('then it should throw an unauthorized exception', async () => {
         jest
           .spyOn(AuthGuard.prototype, 'canActivate')
           .mockRejectedValue(new UnauthorizedException('Unauthorized'));
         mockUsersService.findOne.mockReturnValue(undefined);
-        result = await usersController.findOne(1);
-      });
-
-      test('then it should return undefined', async () => {
-        expect(result).toBeUndefined();
+        expect(await usersController.findOne(1)).toBeUndefined();
       });
     });
   });
@@ -188,18 +176,14 @@ describe('UsersController', () => {
     });
 
     describe('When the guard rejects the request', () => {
-      let result: void | undefined;
-
-      beforeEach(async () => {
+      test('then it should throw an unauthorized exception', async () => {
         jest
           .spyOn(ClerkHttpGuard.prototype, 'canActivate')
           .mockRejectedValue(new UnauthorizedException('Unauthorized'));
         mockClerkService.handleClerkEvent.mockReturnValue(undefined);
-        result = await usersController.handleClerkEvent(create_body);
-      });
-
-      test('then it should return undefined', async () => {
-        expect(result).toBeUndefined();
+        expect(
+          await usersController.handleClerkEvent(create_body),
+        ).toBeUndefined();
       });
     });
   });

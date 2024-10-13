@@ -25,15 +25,15 @@ export class CommentsService {
     return comment;
   }
 
-  async findAll(
-    blog_id: number,
-    limit: number,
-    offset: number,
-  ): Promise<CommentDto[]> {
+  async findAll(data: {
+    blog_id: number;
+    limit: number;
+    offset: number;
+  }): Promise<CommentDto[]> {
     return this.database.query.comments.findMany({
-      where: eq(schema.comments.blog_id, blog_id),
-      limit,
-      offset,
+      where: eq(schema.comments.blog_id, data.blog_id),
+      limit: data.limit,
+      offset: data.offset,
       with: {},
     });
   }
@@ -54,11 +54,14 @@ export class CommentsService {
       );
   }
 
-  async delete(id: number, user_id: string) {
+  async delete(data: { id: number; user_id: string }) {
     await this.database
       .delete(schema.comments)
       .where(
-        and(eq(schema.comments.id, id), eq(schema.comments.user_id, user_id)),
+        and(
+          eq(schema.comments.id, data.id),
+          eq(schema.comments.user_id, data.user_id),
+        ),
       );
   }
 }

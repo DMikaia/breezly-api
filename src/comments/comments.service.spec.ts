@@ -106,7 +106,7 @@ describe('CommentsService', () => {
         mockDatabase.query.comments.findMany.mockResolvedValue([
           queried_comment,
         ]);
-        result = await commentsService.findAll(id, limit, offset);
+        result = await commentsService.findAll({ blog_id: id, limit, offset });
       });
 
       test('then it should call the database to get all the comment of one blog', async () => {
@@ -159,7 +159,10 @@ describe('CommentsService', () => {
   describe('Delete', () => {
     describe('when delete is called', () => {
       beforeEach(async () => {
-        await commentsService.delete(delete_comment.id, delete_comment.user_id);
+        await commentsService.delete({
+          id: delete_comment.id,
+          user_id: delete_comment.user_id,
+        });
       });
 
       test('then it should call the database to delete the comment', async () => {

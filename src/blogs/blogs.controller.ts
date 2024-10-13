@@ -7,6 +7,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { ClerkRequest, AuthGuard } from '@libs/common';
@@ -27,17 +28,23 @@ export class BlogsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', new ParseIntPipe()) id: number) {
     return this.blogsService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Req() req: ClerkRequest) {
+  update(
+    @Param('id', new ParseIntPipe()) id: number,
+    @Req() req: ClerkRequest,
+  ) {
     return this.blogsService.update(req.clerk_id, { id: +id, ...req.body });
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string, @Req() req: ClerkRequest) {
+  delete(
+    @Param('id', new ParseIntPipe()) id: number,
+    @Req() req: ClerkRequest,
+  ) {
     return this.blogsService.delete(req.clerk_id, +id);
   }
 }

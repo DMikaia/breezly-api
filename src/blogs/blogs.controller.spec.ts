@@ -4,7 +4,7 @@ import { BlogsService } from './blogs.service';
 import { ConfigModule } from '@nestjs/config';
 import { AuthGuard, blogs, ClerkRequest, DatabaseModule } from '@libs/common';
 import { blog, blog_dto, mockBlogsService } from '@libs/blog-contracts';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 
 describe('BlogsController', () => {
   let blogsController: BlogsController;
@@ -36,7 +36,7 @@ describe('BlogsController', () => {
         jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
         mockBlogsService.findOne.mockReturnValue(blog);
 
-        result = await blogsController.findOne('1');
+        result = await blogsController.findOne(1);
       });
 
       test('then it should call the find one service', async () => {
@@ -54,7 +54,7 @@ describe('BlogsController', () => {
         mockBlogsService.findOne.mockRejectedValue(
           new NotFoundException('Blog not found'),
         );
-        await expect(blogsController.findOne('1')).rejects.toThrow(
+        await expect(blogsController.findOne(1)).rejects.toThrow(
           NotFoundException,
         );
       });
@@ -65,16 +65,12 @@ describe('BlogsController', () => {
     });
 
     describe('When the guard reject the request', () => {
-      let result: typeof blog;
-
-      beforeEach(async () => {
-        jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
+      test('then it should throw an unauthorized exception', async () => {
+        jest
+          .spyOn(AuthGuard.prototype, 'canActivate')
+          .mockRejectedValue(new UnauthorizedException('Unauthorized'));
         mockBlogsService.findOne.mockReturnValue(undefined);
-        result = await blogsController.findOne('1');
-      });
-
-      test('then is should return undefined', async () => {
-        expect(result).toBeUndefined();
+        expect(await blogsController.findOne(1)).toBeUndefined();
       });
     });
   });
@@ -100,16 +96,12 @@ describe('BlogsController', () => {
     });
 
     describe('When the guard rejects the request', () => {
-      let result: (typeof blog)[];
-
-      beforeEach(async () => {
+      test('then it should throw an unauthorized exception', async () => {
+        jest
+          .spyOn(AuthGuard.prototype, 'canActivate')
+          .mockRejectedValue(new UnauthorizedException('Unauthorized'));
         mockBlogsService.findAll.mockReturnValue(undefined);
-        jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
-        result = await blogsController.findAll();
-      });
-
-      test('then is should return undefined', async () => {
-        expect(result).toBeUndefined();
+        expect(await blogsController.findAll()).toBeUndefined();
       });
     });
   });
@@ -141,15 +133,11 @@ describe('BlogsController', () => {
     });
 
     describe('When the guard rejects the request', () => {
-      let result: undefined | void;
-
-      beforeEach(async () => {
-        jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
-        result = await blogsController.create(casted_request);
-      });
-
-      test('then is should return undefined', async () => {
-        expect(result).toBeUndefined();
+      test('then it should throw an unauthorized exception', async () => {
+        jest
+          .spyOn(AuthGuard.prototype, 'canActivate')
+          .mockRejectedValue(new UnauthorizedException('Unauthorized'));
+        expect(await blogsController.create(casted_request)).toBeUndefined();
       });
     });
   });
@@ -170,7 +158,7 @@ describe('BlogsController', () => {
         jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
         mockBlogsService.update.mockReturnValue(undefined);
 
-        await blogsController.update('1', casted_request);
+        await blogsController.update(1, casted_request);
       });
 
       test('then it should call the update service', async () => {
@@ -182,15 +170,11 @@ describe('BlogsController', () => {
     });
 
     describe('When the guard rejects the request', () => {
-      let result: void | undefined;
-
-      beforeEach(async () => {
-        jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
-        result = await blogsController.update('1', casted_request);
-      });
-
-      test('then is should return undefined', async () => {
-        expect(result).toBeUndefined();
+      test('then it should throw an unauthorized exception', async () => {
+        jest
+          .spyOn(AuthGuard.prototype, 'canActivate')
+          .mockRejectedValue(new UnauthorizedException('Unauthorized'));
+        expect(await blogsController.update(1, casted_request)).toBeUndefined();
       });
     });
   });
@@ -211,7 +195,7 @@ describe('BlogsController', () => {
         jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(true);
         mockBlogsService.delete.mockReturnValue(undefined);
 
-        await blogsController.delete('1', casted_request);
+        await blogsController.delete(1, casted_request);
       });
 
       test('then it should call the delete service', async () => {
@@ -220,15 +204,11 @@ describe('BlogsController', () => {
     });
 
     describe('When the guard reject the request', () => {
-      let result: void | undefined;
-
-      beforeEach(async () => {
-        jest.spyOn(AuthGuard.prototype, 'canActivate').mockResolvedValue(false);
-        await blogsController.delete('1', casted_request);
-      });
-
-      test('then it should return undefined', async () => {
-        expect(result).toBeUndefined();
+      test('then it should throw an unauthorized exception', async () => {
+        jest
+          .spyOn(AuthGuard.prototype, 'canActivate')
+          .mockRejectedValue(new UnauthorizedException('Unauthorized'));
+        expect(await blogsController.delete(1, casted_request)).toBeUndefined();
       });
     });
   });
