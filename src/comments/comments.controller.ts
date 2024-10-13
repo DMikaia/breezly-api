@@ -1,3 +1,6 @@
+import { CommentsService } from './comments.service';
+import { CommentDto } from '@libs/comment-contracts';
+import { AuthGuard, ClerkRequest } from '@libs/common';
 import {
   Body,
   Controller,
@@ -10,9 +13,6 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { CommentsService } from './comments.service';
-import { Comment, CommentDto } from '@libs/comment-contracts';
-import { AuthGuard, ClerkRequest } from '@libs/common';
 
 @UseGuards(AuthGuard)
 @Controller('comments')
@@ -20,8 +20,11 @@ export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Post()
-  async create(@Body() comment: Comment): Promise<void> {
-    return await this.commentsService.create(comment);
+  async create(@Req() req: ClerkRequest): Promise<void> {
+    return await this.commentsService.create({
+      user_id: req.clerk_id,
+      ...req.body,
+    });
   }
 
   @Get()
@@ -42,9 +45,9 @@ export class CommentsController {
     @Req() req: ClerkRequest,
   ): Promise<void> {
     return this.commentsService.update({
-      blog_id: id,
+      id,
       user_id: req.clerk_id,
-      content: req.body.content,
+      ...req.body,
     });
   }
 

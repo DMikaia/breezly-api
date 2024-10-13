@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '@libs/common';
-import { Comment, CommentDto } from '@libs/comment-contracts';
+import { Comment, CommentDto, UpdateComment } from '@libs/comment-contracts';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '@libs/common/schema/comments';
 import { and, eq } from 'drizzle-orm';
@@ -38,23 +38,23 @@ export class CommentsService {
     });
   }
 
-  async create(comment: Comment) {
+  async create(comment: Comment): Promise<void> {
     await this.database.insert(schema.comments).values(comment);
   }
 
-  async update(comment: Comment) {
+  async update(comment: UpdateComment): Promise<void> {
     await this.database
       .update(schema.comments)
       .set(comment)
       .where(
         and(
-          eq(schema.comments.id, comment.blog_id),
+          eq(schema.comments.id, comment.id),
           eq(schema.comments.user_id, comment.user_id),
         ),
       );
   }
 
-  async delete(data: { id: number; user_id: string }) {
+  async delete(data: { id: number; user_id: string }): Promise<void> {
     await this.database
       .delete(schema.comments)
       .where(

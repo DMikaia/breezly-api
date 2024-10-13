@@ -2,6 +2,7 @@ import * as schema from '@libs/common/schema/comments';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CommentsService } from './comments.service';
 import { DATABASE_CONNECTION } from '@libs/common';
+import { and, eq } from 'drizzle-orm';
 import {
   comment,
   CommentDto,
@@ -10,7 +11,6 @@ import {
   find_one,
   queried_comment,
 } from '@libs/comment-contracts';
-import { and, eq } from 'drizzle-orm';
 
 const mockDatabase = {
   query: {
@@ -99,21 +99,20 @@ describe('CommentsService', () => {
 
   describe('Find All', () => {
     describe('when find all is called', () => {
-      const { id, limit, offset } = find_all;
       let result: CommentDto[];
 
       beforeEach(async () => {
         mockDatabase.query.comments.findMany.mockResolvedValue([
           queried_comment,
         ]);
-        result = await commentsService.findAll({ blog_id: id, limit, offset });
+        result = await commentsService.findAll(find_all);
       });
 
       test('then it should call the database to get all the comment of one blog', async () => {
         expect(mockDatabase.query.comments.findMany).toHaveBeenCalledWith({
-          where: eq(schema.comments.blog_id, id),
-          limit,
-          offset,
+          where: eq(schema.comments.blog_id, find_all.blog_id),
+          limit: find_all.limit,
+          offset: find_all.offset,
           with: {},
         });
       });
@@ -140,7 +139,7 @@ describe('CommentsService', () => {
   describe('Update', () => {
     describe('when update is called', () => {
       beforeEach(async () => {
-        await commentsService.update(comment);
+        await commentsService.update({ id: 1, ...comment });
       });
 
       test('then it should call the database to update the comment', async () => {
@@ -148,7 +147,7 @@ describe('CommentsService', () => {
         expect(mockDatabase.update().set).toHaveBeenCalledWith(comment);
         expect(mockDatabase.update().set().where).toHaveBeenCalledWith(
           and(
-            eq(schema.comments.id, comment.blog_id),
+            eq(schema.comments.id, 1),
             eq(schema.comments.user_id, comment.user_id),
           ),
         );

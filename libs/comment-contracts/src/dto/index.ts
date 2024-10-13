@@ -1,3 +1,10 @@
+export class UpdateComment {
+  id: number;
+  blog_id: number;
+  content: string;
+  user_id: string;
+}
+
 export class Comment {
   blog_id: number;
   content: string;
