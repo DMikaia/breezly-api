@@ -1,9 +1,9 @@
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import * as cookieParser from 'cookie-parser';
-import helmet from 'helmet';
+import { AllExceptionsFilter } from '@libs/common';
 import { ConfigService } from '@nestjs/config';
-import { AllExceptionsFilter } from '../libs/common/src/global-filters/all-exceptions.filter';
+import * as cookieParser from 'cookie-parser';
+import { AppModule } from './app.module';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

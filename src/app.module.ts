@@ -16,6 +16,7 @@ import * as Joi from 'joi';
         CLERK_SIGNATURE: Joi.string().required(),
         DATABASE_URL: Joi.string().required(),
         GATEWAY_PORT: Joi.number().port().required(),
+        NODE_ENV: Joi.string().required(),
       }),
     }),
     DatabaseModule,
