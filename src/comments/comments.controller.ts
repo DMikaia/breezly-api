@@ -1,6 +1,6 @@
+import { AuthGuard, ClerkRequest, HttpExceptionFilter } from '@libs/common';
 import { CommentsService } from './comments.service';
 import { CommentDto } from '@libs/comment-contracts';
-import { AuthGuard, ClerkRequest } from '@libs/common';
 import {
   Body,
   Controller,
@@ -11,9 +11,11 @@ import {
   Patch,
   Post,
   Req,
+  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 
+@UseFilters(HttpExceptionFilter)
 @UseGuards(AuthGuard)
 @Controller('comments')
 export class CommentsController {

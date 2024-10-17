@@ -1,3 +1,5 @@
+import { ClerkRequest, AuthGuard, HttpExceptionFilter } from '@libs/common';
+import { BlogsService } from './blogs.service';
 import {
   Controller,
   Get,
@@ -8,10 +10,10 @@ import {
   UseGuards,
   Req,
   ParseIntPipe,
+  UseFilters,
 } from '@nestjs/common';
-import { BlogsService } from './blogs.service';
-import { ClerkRequest, AuthGuard } from '@libs/common';
 
+@UseFilters(HttpExceptionFilter)
 @UseGuards(AuthGuard)
 @Controller('blogs')
 export class BlogsController {

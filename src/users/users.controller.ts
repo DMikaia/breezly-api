@@ -7,14 +7,16 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@libs/common';
+import { AuthGuard, HttpExceptionFilter } from '@libs/common';
 import { ClerkHttpGuard, Data } from '@libs/clerk-contracts';
 import { UserDto } from '@libs/user-contracts';
 import { UsersService } from './users.service';
 import { ClerkService } from './clerk.service';
 
+@UseFilters(HttpExceptionFilter)
 @Controller('users')
 export class UsersController {
   constructor(

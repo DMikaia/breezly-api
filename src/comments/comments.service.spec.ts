@@ -144,7 +144,7 @@ describe('CommentsService', () => {
 
       test('then it should call the database to update the comment', async () => {
         expect(mockDatabase.update).toHaveBeenCalledWith(schema.comments);
-        expect(mockDatabase.update().set).toHaveBeenCalledWith(comment);
+        expect(mockDatabase.update().set).toHaveBeenCalledWith({ id: 1, ...comment });
         expect(mockDatabase.update().set().where).toHaveBeenCalledWith(
           and(
             eq(schema.comments.id, 1),
