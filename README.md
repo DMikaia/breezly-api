@@ -1,9 +1,17 @@
 <p align="center">
-  <a href="#" target="blank"><img src="./assets/logo.ico" width="256" alt="Logo" /></a>
+  <a href="https://clerk.com?utm_source=github&utm_medium=clerk_docs" target="_blank" rel="noopener noreferrer">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./public/light-logo.png">
+      <img alt="Logo" src="./public/dark-logo.png" height="64">
+    </picture>
+  </a>
+  <br />
 </p>
+
 ## Description
 
 **Breezly** is a simple blogging website where users can create and share their blogs with other users.
+
 ## Installation
 
 ```bash
