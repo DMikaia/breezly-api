@@ -2,7 +2,7 @@
   <a href="https://clerk.com?utm_source=github&utm_medium=clerk_docs" target="_blank" rel="noopener noreferrer">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="./assets/light-logo.png">
-      <img alt="Logo" src="./assets/dark-logo.png" height="64">
+      <img alt="Logo" src="./assets/dark-logo.png" height="120">
     </picture>
   </a>
   <br />
